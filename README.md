@@ -8,6 +8,9 @@ Install the required Python packages using pip:
 python -m venv venv
 pip install -r requirements.txt
 
+Generate synthetic data:
+python3 data_gen.py
+
 ## Running the Project
 python main.py
 
