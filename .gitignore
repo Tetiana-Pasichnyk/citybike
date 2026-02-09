@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.env/
+citybike/
+.ipynb_checkpoints
+output/figures/*.png
+*.log
+.DS_Store
