@@ -5,6 +5,7 @@ Analytical platform for the bike-sharing system.
 
 ## Installation
 Install the required Python packages using pip:
+python -m venv venv
 pip install -r requirements.txt
 
 ## Running the Project
