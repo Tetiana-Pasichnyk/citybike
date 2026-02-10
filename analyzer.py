@@ -5,6 +5,12 @@ from utils import (
     VALID_USER_TYPES, VALID_BIKE_TYPES, VALID_MAINTENANCE_TYPES,
     validate_in
 )
+from numerical import (
+    station_distance_matrix, trip_duration_stats, detect_outliers_zscore,
+    calculate_fares
+)
+
+
 DATA_DIR = Path(__file__).resolve().parent / "data"
 OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 
@@ -13,6 +19,8 @@ class BikeShareSystem:
         self.trips: pd.DataFrame | None = None
         self.stations: pd.DataFrame | None = None
         self.maintenance: pd.DataFrame | None = None
+        self.stations_ids: np.ndarray | None = None
+        self.stations_distances: np.ndarray | None = None
 
     # ------------------------------------------------------------------
     # Data loading
@@ -38,7 +46,7 @@ class BikeShareSystem:
         # ---- Parse datetime columns ----
         self.trips["start_time"] = pd.to_datetime(self.trips["start_time"], errors="coerce")
         self.trips["end_time"] = pd.to_datetime(self.trips["end_time"], errors="coerce")
-        self.maintenance["maintenance_date"] = pd.to_datetime(self.maintenance["maintenance_date"], errors="coerce")
+        self.maintenance["maintenance_date"] = pd.to_datetime(self.maintenance["date"], errors="coerce")
 
         # ---- Convert numeric columns ----
         self.trips["distance_km"] = pd.to_numeric(self.trips["distance_km"], errors="coerce")
@@ -71,6 +79,44 @@ class BikeShareSystem:
         self.maintenance.to_csv(DATA_DIR / "maintenance_clean.csv", index=False)
 
         print("Data cleaning complete.")
+
+    # ------------------------------------------------------------------
+    # NumPy-based calculations (Milestone 5)
+    # ------------------------------------------------------------------
+    def build_station_distance_matrix(self):
+        """Compute pairwise distances between stations."""
+        lats = self.stations["latitude"].to_numpy()
+        lons = self.stations["longitude"].to_numpy()
+        self.station_ids = self.stations["station_id"].to_numpy()
+        self.station_distances = station_distance_matrix(lats, lons)
+
+    def add_trip_distances(self):
+        """Assign distance to each trip using station distance matrix."""
+        id_to_idx = {sid: i for i, sid in enumerate(self.station_ids)}
+        start_idx = self.trips["start_station_id"].map(id_to_idx).to_numpy()
+        end_idx = self.trips["end_station_id"].map(id_to_idx).to_numpy()
+        self.trips["distance"] = self.station_distances[start_idx, end_idx]
+
+    def flag_duration_outliers(self, threshold=3.0):
+        """Mark trips with z-score outliers."""
+        self.trips["is_outlier"] = detect_outliers_zscore(
+            self.trips["duration_minutes"].to_numpy(), threshold
+        )
+
+    def compute_fares(self, per_min=0.15, per_km=0.10, unlock_fee=1.0):
+        """Compute fares for all trips."""
+        self.trips["fare"] = calculate_fares(
+            self.trips["duration_minutes"].to_numpy(),
+            self.trips["distance"].to_numpy(),
+            per_minute=per_min,
+            per_km=per_km,
+            unlock_fee=unlock_fee
+        )
+
+    def save_trips_with_numerical(self, path=DATA_DIR / "trips_clean.csv"):
+        """Save trips with added numerical columns to CSV."""
+        self.trips.to_csv(path, index=False)
+        print(f"[OK] Saved {path}")
 
     # ------------------------------------------------------------------
     #     Analytics examples 
