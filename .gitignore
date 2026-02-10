@@ -9,3 +9,4 @@ output/figures/*.png
 data/trips_clean.csv
 data/stations_clean.csv
 data/maintenance_clean.csv
+output/summary_report.txt
