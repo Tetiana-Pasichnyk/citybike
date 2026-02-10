@@ -9,6 +9,7 @@ from numerical import (
     station_distance_matrix, trip_duration_stats, detect_outliers_zscore,
     calculate_fares
 )
+from pricing import CasualPricing, MemberPricing, PeakHourPricing
 
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
@@ -103,15 +104,23 @@ class BikeShareSystem:
             self.trips["duration_minutes"].to_numpy(), threshold
         )
 
-    def compute_fares(self, per_min=0.15, per_km=0.10, unlock_fee=1.0):
-        """Compute fares for all trips."""
-        self.trips["fare"] = calculate_fares(
-            self.trips["duration_minutes"].to_numpy(),
-            self.trips["distance"].to_numpy(),
-            per_minute=per_min,
-            per_km=per_km,
-            unlock_fee=unlock_fee
-        )
+    def compute_fares(self):
+        fares = []
+        for _, row in self.trips.iterrows():
+            if row.user_type == "casual":
+                strategy = CasualPricing()
+            elif row.user_type == "member":
+                strategy = MemberPricing()
+            else:
+                strategy = CasualPricing()
+
+            if 7 <= row.start_time.hour <= 9 or 17 <= row.start_time.hour <= 19:
+                strategy = PeakHourPricing()
+
+            fare = strategy.calculate_cost(row.duration_minutes, row.distance)
+            fares.append(fare)
+
+        self.trips["fare"] = fares
 
     def save_trips_with_numerical(self, path=DATA_DIR / "trips_clean.csv"):
         """Save trips with added numerical columns to CSV."""

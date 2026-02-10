@@ -1,34 +1,48 @@
 from analyzer import BikeShareSystem
+from pricing import CasualPricing, MemberPricing, PeakHourPricing
 
-system = BikeShareSystem()
-system.load_data()
-system.clean_data()  
-system.build_station_distance_matrix()
-system.add_trip_distances()
-system.flag_duration_outliers()
-system.compute_fares()
-system.save_trips_with_numerical()
 
-popular_routes = system.popular_routes(n=10)
-print("\n--- Top 10 Popular Routes ---")
-print(popular_routes)
+def main(): 
+    system = BikeShareSystem()
 
-maintenance_cost = system.maintenance_cost_by_bike_type()
-print("\n--- Maintenance Cost by Bike Type ---")
-print(maintenance_cost)
+    # Step 1 — Load data
+    print("\n>>> Loading data …")
+    system.load_data()
 
-bike_utilization = system.bike_utilization_rate()
-print("\n--- Bike Utilization Rate ---")
-print(bike_utilization.head(10))
+    # Step 2 — Clean
+    print("\n>>> Cleaning data …")
+    system.clean_data() 
 
-abandoned = system.abandoned_bikes()
-print("\n--- Abandoned / Anomalous Bikes ---")
-print(abandoned.head(10))
+    # Step 3 — Analytics
+    print("\n>>> Running analytics …")
+    summary = system.total_trips_summary()
+    print(f"  Total trips      : {summary['total_trips']}")
+    print(f"  Total distance   : {summary['total_distance_km']} km")
+    print(f"  Avg duration     : {summary['avg_duration_min']} min")
 
-arpu = system.average_revenue_per_user()
-print(f"\n--- Average Revenue per User (ARPU) ---\n${arpu}")
+    print("\n>>> Building distance matrix …")
+    system.build_station_distance_matrix()
+    system.add_trip_distances()
+    system.flag_duration_outliers()
 
-print(system.trips[["trip_id","distance","fare","is_outlier"]].head())
-system.generate_summary_report() 
+    print("\n>>> Computing fares …")
+    system.compute_fares() 
+    system.save_trips_with_numerical()
 
-print("\n[FINISH] Script executed successfully.")
+    print("\n--- First 10 trips with fares ---")
+    print(system.trips[["trip_id","user_type","start_time","distance","duration_minutes","fare"]].head(10))
+
+    print("\n--- ARPU ---")
+    print(system.average_revenue_per_user())
+
+
+
+    # Step 4 — Report
+    print("\n>>> Generating summary report …")
+    system.generate_summary_report()
+
+
+    print("\n>>> Done! Check output/ for results.")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,43 @@
+from abc import ABC, abstractmethod
+
+# ---------------------------------------------------------------------------
+# Strategy interface
+# ---------------------------------------------------------------------------
+
+class PricingStrategy(ABC):
+    """Abstract pricing strategy — computes the cost of a trip."""
+
+    @abstractmethod
+    def calculate_cost(self, duration_minutes: float, distance_km: float) -> float:
+        """Return the trip cost in euros."""
+        ...
+
+# ---------------------------------------------------------------------------
+# Concrete strategies
+# ---------------------------------------------------------------------------
+
+class CasualPricing(PricingStrategy):
+    """Pricing for casual (non-member) users."""
+    UNLOCK_FEE = 1.0
+    PER_MINUTE = 0.15
+    PER_KM = 0.10
+
+    def calculate_cost(self, duration_minutes: float, distance_km: float) -> float:
+        return self.UNLOCK_FEE + self.PER_MINUTE * duration_minutes + self.PER_KM * distance_km
+
+class MemberPricing(PricingStrategy):
+    """Pricing for member users — discounted rates."""
+    PER_MINUTE = 0.08
+    PER_KM = 0.05
+
+    def calculate_cost(self, duration_minutes: float, distance_km: float) -> float:
+        return self.PER_MINUTE * duration_minutes + self.PER_KM * distance_km
+
+class PeakHourPricing(PricingStrategy):
+    """Pricing during peak hours (surcharge on top of casual rates)."""
+    MULTIPLIER = 1.5
+
+    def calculate_cost(self, duration_minutes: float, distance_km: float) -> float:
+        base_cost = CasualPricing().calculate_cost(duration_minutes, distance_km)
+        return base_cost * self.MULTIPLIER
+
