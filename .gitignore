@@ -5,3 +5,7 @@ __pycache__/
 output/figures/*.png
 .DS_Store
 
+# ignore generated CSVs
+data/trips_clean.csv
+data/stations_clean.csv
+data/maintenance_clean.csv
