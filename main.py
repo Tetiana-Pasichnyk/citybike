@@ -1,6 +1,5 @@
 from analyzer import BikeShareSystem
-from pricing import CasualPricing, MemberPricing, PeakHourPricing
-
+import visualization
 
 def main(): 
     system = BikeShareSystem()
@@ -35,9 +34,14 @@ def main():
     print("\n--- ARPU ---")
     print(system.average_revenue_per_user())
 
+    # Step 4 — Visualizations
+    print("\n>>> Generating visualizations (Milestone 7) …")
+    visualization.generate_all_plots(system)
 
+    # Step 5 — Report
+    print("\n>>> Exporting top stations and top users CSV …")
+    system.export_top_csvs()
 
-    # Step 4 — Report
     print("\n>>> Generating summary report …")
     system.generate_summary_report()
 
