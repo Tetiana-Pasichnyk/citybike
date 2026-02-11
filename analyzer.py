@@ -202,10 +202,11 @@ class BikeShareSystem:
     
     def top_active_users(self, n: int = 15) -> pd.DataFrame:
         """Compute top-N active users by total usage minutes and number of trips."""
-        df = self.trips.groupby('user_id').agg(
+        df = self.trips.groupby(['user_id', 'user_type']).agg(
             total_trips=('trip_id', 'count'),
             total_usage_min=('duration_minutes', 'sum')
         ).reset_index()
+        df['total_usage_min'] = df['total_usage_min'].round(2)
         df = df.sort_values('total_usage_min', ascending=False).head(n)
         return df
 

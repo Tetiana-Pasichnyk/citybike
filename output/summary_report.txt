@@ -1,0 +1,109 @@
+============================================================
+   CityBike — Summary Business Report
+============================================================
+
+[1] OVERALL SUMMARY
+    Total trips: 1500 | Distance: 11502.38 km
+
+[2] TOP 10 START STATIONS
+     station_name  trip_count
+         Old Town         113
+   Riverside Park         110
+    Market Square         110
+      Harbor View         107
+Business District         105
+        City Hall         104
+         Tech Hub         103
+         Lakeside         103
+  Central Station          99
+University Campus          97
+
+[3] PEAK USAGE HOURS
+start_time
+6     74
+7     98
+8     68
+9     82
+10    76
+11    88
+12    91
+13    83
+14    76
+15    92
+16    95
+17    91
+18    99
+19    96
+20    98
+21    98
+22    95
+
+[4] BUSIEST DAY OF WEEK
+start_time
+Tuesday      229
+Wednesday    224
+Thursday     217
+Monday       217
+Friday       213
+Sunday       208
+Saturday     192
+
+[5] AVG DISTANCE BY USER TYPE
+user_type
+casual    7.500981
+member    7.760990
+
+[6] TOP 5 ROUTES (Start -> End)
+start_station_name end_station_name  trip_count
+          Lakeside         Tech Hub          14
+       Harbor View      Harbor View          13
+ University Campus         Tech Hub          12
+    Riverside Park   Riverside Park          12
+          Old Town Airport Terminal          12
+
+[7] MAINTENANCE COSTS BY TYPE
+bike_type      sum       mean
+ electric 13988.04 111.904320
+  classic  5496.39  82.035672
+
+[8] TOP 10 UTILIZED BIKES (By Total Duration)
+Bike ID  Total Minutes     Type
+  BK261         2278.2  classic
+  BK329         2188.5  classic
+  BK312         1945.7 electric
+  BK295         1700.4  classic
+  BK227         1329.8 electric
+  BK251         1311.8 electric
+  BK320         1005.8  classic
+  BK328          979.4  classic
+  BK325          876.6  classic
+  BK327          862.8  classic
+
+[9] TOP ANOMALOUS BIKES
+bike_id  num_outliers
+  BK325             3
+  BK283             3
+  BK244             2
+  BK295             2
+  BK328             2
+
+[10] TOP 15 ACTIVE USERS
+user_id user_type  total_trips  total_usage_min
+USR1053    member           29            786.5
+USR1040    member           25            782.7
+USR1014    member           34            731.7
+USR1080    member           30            725.9
+USR1189    member           27            713.5
+USR1004    member           31            710.4
+USR1047    member           21            682.1
+USR1162    member           18            576.3
+USR1032    member           29            544.3
+USR1003    member           22            532.4
+USR1034    member           20            522.7
+USR1110    member           15            512.5
+USR1014    casual           26            508.0
+USR1094    member           19            480.7
+USR1189    casual           16            470.4
+
+[11] FINANCIAL PERFORMANCE
+    ARPU: $98.19

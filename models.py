@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
+from utils import validate_email, validate_positive
 
 
 # ---------------------------------------------------------------------------
@@ -70,8 +71,8 @@ class ElectricBike(Bike):
         if max_range_km <= 0:
             raise ValueError("max_range_km must be positive")
 
-        self.battery_level = battery_level
-        self.max_range_km = max_range_km
+        self.battery_level = validate_positive(battery_level, "Battery level")
+        self.max_range_km = validate_positive(max_range_km, "Max range")
 
     def __str__(self):
         return f"Electric Bike {self.id} (Battery: {self.battery_level}%)"
@@ -89,7 +90,7 @@ class User(Entity):
             raise ValueError("Invalid email format")
 
         self.name = name
-        self.email = email
+        self.email = validate_email(email)
         self.user_type = user_type
 
     def __str__(self):
@@ -159,7 +160,7 @@ class Station(Entity):
             raise ValueError("Invalid longitude")
 
         self.name = name
-        self.capacity = capacity
+        self.capacity = validate_positive(capacity, "Station capacity")
         self.latitude = latitude
         self.longitude = longitude
 
@@ -243,7 +244,7 @@ class MaintenanceRecord(Entity):
         self.bike = bike
         self.date = date
         self.maintenance_type = maintenance_type
-        self.cost = cost
+        self.cost = validate_positive(cost, "Maintenance cost") 
         self.description = description
 
     def __str__(self):

@@ -4,6 +4,18 @@
 
 **Project Type:** Educational project for practicing Python OOP, algorithms, and data analysis. Analytical platform for a bike-sharing system to simulate, process, and analyze trip data.
 
+## Project Goal
+
+The goal of this project is to simulate and analyze a bike-sharing system
+using Python. The project demonstrates:
+
+- Object-Oriented Programming
+- Custom algorithms (sorting, searching)
+- NumPy vectorized calculations
+- Business analytics
+- Automated reporting
+- Visualizations
+
 ## Installation
 
 1. Create a virtual environment:
@@ -84,3 +96,44 @@ Based on testing, built-in `sorted()` and `in` operators are significantly faste
 * Custom algorithms are implemented and ready for benchmarking.
 * Built-in Python functions remain faster due to low-level optimizations.
 * Binary search is significantly faster than linear search on large, sorted datasets.
+
+## Analysis Results (Sample)
+
+### Overall Summary
+- Total trips: 1500  
+- Total distance: 11,502 km  
+- ARPU: $98.19  
+
+### Peak Usage
+- Busiest hour: 18:00  
+- Busiest day: Tuesday  
+
+### Top Stations
+1. Old Town (113 trips)  
+2. Riverside Park (110)  
+3. Market Square (110)  
+
+### Top Routes
+- Lakeside → Tech Hub (14 trips)
+- Harbor View → Harbor View (13 trips)
+
+### Financial & Maintenance
+- Electric bikes: $13,988 total maintenance
+- Classic bikes: $5,496 total maintenance
+
+### Anomalies
+- BK325, BK283 → highest number of outlier trips
+
+## Visualizations
+
+### 1. Revenue by User Type
+![Revenue by User Type](output/figures/01_bar_revenue.png)
+
+### 2. Monthly Trip Volume Trend
+![Monthly Trip Volume Trend](output/figures/02_line_trend.png)
+
+### 3. Trip Duration Distribution
+![Trip Duration Distribution](output/figures/03_hist_duration.png)
+
+### 4. Trip Duration Comparison by User Type
+![Trip Duration Comparison](output/figures/04_boxplot_duration.png)
