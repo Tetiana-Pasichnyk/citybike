@@ -5,7 +5,6 @@ Provides validation, date parsing, and formatting functions.
 Keep I/O-free — these are pure helper functions.
 """
 
-import re
 from datetime import datetime
 from typing import Any
 

@@ -6,8 +6,7 @@ from utils import (
     validate_in
 )
 from numerical import (
-    station_distance_matrix, trip_duration_stats, detect_outliers_zscore,
-    calculate_fares
+    station_distance_matrix, detect_outliers_zscore
 )
 from pricing import CasualPricing, MemberPricing, PeakHourPricing
 
