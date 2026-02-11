@@ -163,19 +163,22 @@ class BikeShareSystem:
 
 
     def bike_utilization_rate(self) -> pd.DataFrame:
-        """Compute number of trips per bike, including bike type."""
-        # Count trips per bike
-        trips_per_bike = self.trips.groupby('bike_id').size().reset_index(name='num_trips')
+        """
+        Computes the total usage duration per bike.
+        Ensures each bike ID is unique by removing duplicate type entries.
+        """
+        # Sum total duration for each bike ID
+        util = self.trips.groupby('bike_id')['duration_minutes'].sum().reset_index(name='total_usage_min')
 
-        # Merge bike type (avoid duplicates if bike_id is unique)
-        trips_per_bike = trips_per_bike.merge(
-            self.trips[['bike_id', 'bike_type']].drop_duplicates(),
-            on='bike_id'
-        )
+        # Create a unique mapping of bike_id to bike_type to prevent duplicates on charts
+        # subset=['bike_id'] ensures BK312 (and others) appear only once
+        bike_types = self.trips[['bike_id', 'bike_type']].drop_duplicates(subset=['bike_id'])
 
-        # Sort by number of trips descending
-        return trips_per_bike.sort_values('num_trips', ascending=False)
+        # Merge duration with bike types using a left join
+        util = util.merge(bike_types, on='bike_id', how='left')
 
+        # Sort by duration in descending order for top-N analysis
+        return util.sort_values('total_usage_min', ascending=False)
 
     def abandoned_bikes(self) -> pd.DataFrame:
         """Identify bikes with anomalous trips (outliers)."""
@@ -196,6 +199,16 @@ class BikeShareSystem:
 
         # Compute mean and round to 2 decimals
         return round(user_revenue.mean(), 2)
+    
+    def top_active_users(self, n: int = 15) -> pd.DataFrame:
+        """Compute top-N active users by total usage minutes and number of trips."""
+        df = self.trips.groupby('user_id').agg(
+            total_trips=('trip_id', 'count'),
+            total_usage_min=('duration_minutes', 'sum')
+        ).reset_index()
+        df = df.sort_values('total_usage_min', ascending=False).head(n)
+        return df
+
 
     # ------------------------------------------------------------------
     #     Analytics und Summary Reports
@@ -270,20 +283,43 @@ class BikeShareSystem:
 
         # [8] Bike utilization
         util = self.bike_utilization_rate().head(10)
-        lines.append("\n[8] TOP 10 UTILIZED BIKES")
-        lines.append(util.to_string(index=False))
+        lines.append("\n[8] TOP 10 UTILIZED BIKES (By Total Duration)")
+        lines.append(util.rename(columns={
+            'bike_id': 'Bike ID', 
+            'bike_type': 'Type', 
+            'total_usage_min': 'Total Minutes'
+        }).to_string(index=False))
 
         # [9] Anomalies
         abnormal = self.abandoned_bikes().head(5)
         lines.append("\n[9] TOP ANOMALOUS BIKES")
         lines.append(abnormal.to_string(index=False) if not abnormal.empty else "No anomalies detected")
 
-        # [10] Financial Performance
-        arpu = self.average_revenue_per_user()
-        lines.append(f"\n[10] FINANCIAL PERFORMANCE\n    ARPU: ${arpu}")
+        # [10] Top active users
+        lines.append("\n[10] TOP 15 ACTIVE USERS")
+        top_users = self.top_active_users()
+        lines.append(top_users.to_string(index=False))
 
-        # Финальная запись
+        # [11] Financial Performance
+        arpu = self.average_revenue_per_user()
+        lines.append(f"\n[11] FINANCIAL PERFORMANCE\n    ARPU: ${arpu}")
+
         report_text = "\n".join(lines) + "\n"
         report_path.write_text(report_text)
         
-        print(f"\n[OK] Full 10-point analytics report created at: {report_path}")
+        print(f"\n[OK] Full 11-point analytics report created at: {report_path}")
+
+    # ------------------------------------------------------------------
+    # Export top stations and users CSV
+    # ------------------------------------------------------------------
+    def export_top_csvs(self):
+        """Export top stations and top users to CSV files."""
+        DATA_DIR.mkdir(exist_ok=True)
+        
+        # Top 10 start stations
+        self.top_start_stations().to_csv(OUTPUT_DIR / "top_station.csv", index=False)
+        
+        # Top 15 active users by total usage
+        self.top_active_users().to_csv(OUTPUT_DIR / "top_users.csv", index=False)
+
+        print(f"[OK] top_station.csv and top_users.csv saved to {OUTPUT_DIR}")
